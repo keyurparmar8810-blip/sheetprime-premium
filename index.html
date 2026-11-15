@@ -1,0 +1,782 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#061b2b">
+<meta name="description" content="SheetPrime Premium — Your Sheets. Your Ideas. Simplified.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SheetPrime">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<title>SheetPrime Premium</title>
+<style>
+:root{
+ --bg:#0b121a;--panel:#131f2b;--panel2:#192735;
+ --line:#293b49;--text:#edf5f7;--muted:#91a4b1;
+ --green:#42d58a;--green2:#1d9c60;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+ font-family:Inter,Arial,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;color:var(--text);background:#20313e;
+ border:1px solid #344957;border-radius:9px;padding:9px 12px}
+button:hover{border-color:var(--green);background:#263d49}
+button:active{transform:scale(.98)}
+.primary{background:var(--green);color:#07170f;border:0;font-weight:700}
+.topbar{height:66px;display:flex;align-items:center;justify-content:space-between;
+ padding:0 20px;background:#111d28;border-bottom:1px solid var(--line);gap:12px}
+.brand{font-size:23px;font-weight:850;letter-spacing:-1px}
+.brand span{color:var(--green)}
+.top-right{display:flex;align-items:center;gap:12px}
+.status{font-size:12px;color:var(--green)}
+.avatar{width:34px;height:34px;border-radius:50%;background:#24563f;
+ display:grid;place-items:center;font-weight:bold;color:#a5ffd0}
+.app{max-width:1500px;margin:auto;padding:16px}
+.heading{display:flex;align-items:center;justify-content:space-between;
+ gap:12px;flex-wrap:wrap;margin-bottom:15px}
+.heading h1{font-size:22px;margin:0}
+.heading p{font-size:12px;color:var(--muted);margin:5px 0 0}
+.history-actions{display:flex;gap:9px;margin:0 0 10px;position:relative;z-index:2}
+.history-actions button{flex:1;min-height:44px;font-size:14px;font-weight:700}
+.history-actions button:last-child{background:#1c5039;border-color:var(--green);color:#baffd7}
+.ribbon{background:var(--panel);border:1px solid var(--line);
+ border-radius:13px;overflow:hidden;margin-bottom:12px}
+.ribbon-tabs{display:flex;gap:4px;padding:8px 10px;
+ border-bottom:1px solid var(--line);overflow-x:auto}
+.ribbon-tabs button{border:0;background:transparent;white-space:nowrap}
+.ribbon-tabs button.active{color:var(--green);
+ background:#1c382e}
+.ribbon-tools{display:flex;align-items:center;gap:8px;
+ flex-wrap:wrap;padding:12px}
+.tool-group{display:flex;gap:6px;flex-wrap:wrap;
+ padding-right:12px;border-right:1px solid var(--line)}
+.tool-group:last-child{border:0}
+.tool-group button{font-size:12px;padding:8px 10px}
+.formula-panel{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+ background:var(--panel);border:1px solid var(--line);
+ border-radius:12px;padding:10px;margin-bottom:12px}
+.namebox{width:65px;text-align:center;font-weight:bold;color:var(--green)}
+input,select{min-width:0;background:#0b1720;color:white;
+ border:1px solid #344957;border-radius:8px;padding:10px}
+#formulaInput{flex:1;min-width:90px}
+.fx-button{flex:0 0 auto;min-width:62px;background:#1c5039;border:1px solid var(--green);color:#baffd7;font-weight:800;padding:10px 12px}
+.formula-panel button{flex-shrink:0;font-size:12px;padding:9px 10px}
+.formula-help{width:100%;font-size:11px;color:var(--muted);padding-left:4px}
+.sheet-panel{background:var(--panel);border:1px solid var(--line);
+ border-radius:13px;padding:10px}
+.gridwrap{overflow:auto;max-height:58vh;border-radius:8px;background:white}
+table{border-collapse:separate;border-spacing:0;min-width:650px;
+ width:100%;table-layout:fixed;color:#17232b}
+th,td{border-right:1px solid #d8dfe3;border-bottom:1px solid #d8dfe3;
+ min-width:90px;width:120px;height:36px;padding:7px;
+ overflow:hidden;white-space:nowrap}
+th{background:#e9eff2;text-align:center;position:sticky;top:0;z-index:3}
+th:first-child{left:0;z-index:5;width:44px;min-width:44px}
+td:first-child{position:sticky;left:0;z-index:2;
+ background:#e9eff2;text-align:center;width:44px;min-width:44px}
+td[contenteditable="true"]{background:#fff;outline:none;overflow:hidden}
+td[contenteditable="true"]:focus{outline:2px solid #20a968;
+ outline-offset:-2px;background:#f0fff6}
+.resize-handle{position:absolute;right:-8px;top:0;width:24px;height:100%;cursor:col-resize;z-index:50;pointer-events:auto;touch-action:none;background:linear-gradient(to right,transparent 45%,#20a968 45%,#20a968 55%,transparent 55%);border-radius:8px}
+.row-handle{position:absolute;bottom:-8px;left:0;width:100%;height:24px;cursor:row-resize;z-index:50;pointer-events:auto;touch-action:none;background:linear-gradient(to bottom,transparent 45%,#20a968 45%,#20a968 55%,transparent 55%);border-radius:8px}
+th,td{position:relative;overflow:visible}
+.sheetbar{display:flex;gap:7px;align-items:center;
+ overflow-x:auto;padding:12px 2px 2px}
+.sheet-tab{white-space:nowrap}
+.sheet-tab.selected{background:#1c5039;border-color:var(--green)}
+.chart-panel{margin-top:13px;background:var(--panel);
+ border:1px solid var(--line);border-radius:13px;padding:14px}
+.chart-panel h3{font-size:14px;margin:0 0 10px}
+#chart{width:100%;height:220px;display:block}
+.footer{text-align:center;color:#738895;font-size:11px;padding:18px}
+@media(max-width:650px){
+ .topbar{height:56px;padding:0 11px}
+ .brand{font-size:20px}
+ .app{padding:9px}
+ .heading h1{font-size:18px}
+ .ribbon-tools{padding:9px}
+ .tool-group{padding-right:5px}
+ .tool-group button{font-size:11px;padding:8px}
+ .formula-panel{gap:5px;padding:7px;flex-wrap:wrap}
+ .formula-panel button{font-size:11px;padding:8px 7px}
+ .formula-help{font-size:10px}
+ #formulaInput{flex:1 1 120px;min-width:100px}
+ .fx-button{min-width:58px;padding:9px 8px}
+ .formula-panel .primary{padding:9px 10px}
+ .namebox{width:48px;padding:9px 3px}
+ #formulaInput{font-size:12px}
+ .gridwrap{max-height:52vh}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+ <div class="brand">Sheet<span>Prime</span></div>
+ <div class="top-right">
+   <button id="installAppBtn" type="button" hidden style="padding:7px 10px;font-size:12px">Install App</button>
+  <div class="status" id="saveStatus">● Saved</div>
+  <div class="avatar">S</div>
+ </div>
+</header>
+<main class="app">
+ <section class="heading">
+  <div>
+   <h1 id="sheetTitle">My Workspace</h1>
+   <p>Your ideas, organized beautifully.</p>
+  </div>
+  <button class="primary" onclick="addSheet()">＋ New Sheet</button>
+ </section>
+
+ <div class="history-actions" aria-label="Edit history">
+  <button type="button" onclick="undo()">↶ Undo</button>
+  <button type="button" onclick="redo()">↷ Redo</button>
+ </div>
+ <section class="ribbon">
+  <nav class="ribbon-tabs">
+   <button class="active" onclick="showTab('home',this)">Home</button>
+   <button onclick="showTab('insert',this)">Insert</button>
+   <button onclick="showTab('data',this)">Data</button>
+   <button onclick="showTab('view',this)">View</button>
+  </nav>
+  <div class="ribbon-tools" id="homeTools">
+   <div class="tool-group">
+    <button onclick="addRow()">＋ Row</button>
+    <button onclick="addColumn()">＋ Column</button>
+   </div>
+   <div class="tool-group">
+    <button onclick="deleteRow()">− Row</button>
+    <button onclick="deleteColumn()">− Column</button>
+   </div>
+   <div class="tool-group">
+    <button onclick="formatBold()">B Bold</button>
+    <button onclick="spFormat('italic')">Italic</button><button onclick="spFormat('underline')">Underline</button>
+    <label>Text <input type="color" value="#111111" onchange="spFormat('color',this.value)"></label>
+    <label>Fill <input type="color" value="#fff2a8" onchange="spFormat('background',this.value)"></label>
+    <button onclick="spFormat('align','left')">Left</button><button onclick="spFormat('align','center')">Center</button><button onclick="spFormat('align','right')">Right</button>
+    <button onclick="spFormat('border')">Border</button><button onclick="clearCell()">Clear Cell</button>
+   </div>
+  </div>
+  <div class="ribbon-tools" id="insertTools" hidden>
+   <div class="tool-group">
+    <button onclick="createChart('bar')">Bar Chart</button>
+    <button onclick="createChart('line')">Line Chart</button>
+    <button onclick="createChart('pie')">Pie Chart</button>
+    <button onclick="createChart('area')">Area Chart</button>
+   </div>
+  </div>
+  <div class="ribbon-tools" id="dataTools" hidden>
+   <div class="tool-group">
+    <button onclick="downloadCSV()">↓ CSV Export</button><button onclick="document.getElementById('spCsv').click()">CSV Import</button>
+    <button onclick="spXlsxExport()">XLSX Export</button><button onclick="document.getElementById('spXlsx').click()">XLSX Import</button>
+    <button onclick="spPdfExport()">PDF Export</button><button onclick="document.getElementById('spPdf').click()">PDF Import</button>
+    <button onclick="spSearch()">Find</button><button onclick="spFind(-1)">Prev</button><button onclick="spFind(1)">Next</button>
+    <button onclick="sortData()">Sort A–Z</button>
+   </div>
+  </div>
+  <div class="ribbon-tools" id="viewTools" hidden>
+   <div class="tool-group">
+    <button onclick="renameSheet()">Rename Sheet</button>
+    <button onclick="clearChart()">Hide Chart</button>
+   </div>
+  </div>
+ </section>
+
+ <section class="formula-panel">
+  <input class="namebox" id="cellName" value="A1" readonly>
+  <input id="formulaInput" placeholder="Value, =SUM(A1:A5), or SUM A1:A3">
+  <button type="button" id="fxButton" class="fx-button" onclick="quickFunction('SUM')">Σ AutoSum</button>
+  <button type="button" onclick="quickFunction('AVERAGE')">Average</button>
+  <button type="button" onclick="quickFunction('COUNT')">Count</button>
+  <button type="button" onclick="quickFunction('MIN')">Min</button>
+  <button type="button" onclick="quickFunction('MAX')">Max</button>
+  <button class="primary" onclick="applyFormula()">Apply</button>
+  <div class="formula-help">Easy mode: numbers ke neeche wali khaali cell select karein, phir Σ AutoSum dabayein. Formula khud ban jayega.</div>
+ </section>
+
+ <section class="sheet-panel">
+  <div class="gridwrap">
+   <table id="sheetGrid"></table>
+  </div>
+  <div class="sheetbar" id="sheetTabs"></div>
+ </section>
+
+ <section class="chart-panel">
+  <h3>Chart Preview</h3>
+  <canvas id="chart"></canvas>
+ </section>
+ <input id="spCsv" type="file" accept=".csv,text/csv" hidden onchange="spImportCSV(event)"><input id="spXlsx" type="file" accept=".xlsx,.xls" hidden onchange="spImportXlsx(event)"><input id="spPdf" type="file" accept=".pdf,application/pdf" hidden onchange="spImportPdf(event)">
+ <footer class="footer">SheetPrime Premium Workspace · Local autosave <span id="offlineStatus" aria-live="polite">· Checking connection…</span></footer>
+</main>
+
+<script>
+"use strict";
+
+let sheets=[makeSheet("Sheet 1")];
+let activeSheet=0;
+let selectedCell={r:0,c:0};
+let history=[];
+let redoHistory=[];
+let chartType="bar";
+
+function makeSheet(name){
+ return {name,rows:10,cols:5,data:{},widths:{},heights:{}};
+}
+function sheet(){return sheets[activeSheet]}
+function key(r,c){return r+"_"+c}
+function colName(n){
+ let s="";n++;
+ while(n){let x=(n-1)%26;s=String.fromCharCode(65+x)+s;n=Math.floor((n-1)/26)}
+ return s;
+}
+function colNumber(s){
+ let n=0;
+ for(let ch of s)n=n*26+ch.charCodeAt(0)-64;
+ return n-1;
+}
+function escapeHTML(v){
+ return String(v).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+}
+function save(){
+ try{
+  const old=localStorage.getItem("sheetlite_complete_v2");
+  if(old){try{const parsed=JSON.parse(old);if(parsed&&Array.isArray(parsed.sheets))localStorage.setItem("sheetlite_complete_v2_backup",old);else{document.getElementById("saveStatus").textContent="● Backup check failed";return;}}catch(err){document.getElementById("saveStatus").textContent="● Backup check failed";return;}}
+  localStorage.setItem("sheetlite_complete_v2",JSON.stringify({sheets,activeSheet}));
+  document.getElementById("saveStatus").textContent="● Saved";
+ }catch(e){
+  document.getElementById("saveStatus").textContent="● Save error";
+ }
+}
+function load(){
+ try{
+  let d=JSON.parse(localStorage.getItem("sheetlite_complete_v2"));
+  if(d&&Array.isArray(d.sheets)&&d.sheets.length){
+   sheets=d.sheets;activeSheet=Math.min(d.activeSheet||0,sheets.length-1);
+   sheets.forEach(s=>{s.widths=s.widths||{};s.heights=s.heights||{};});
+  }
+ }catch(e){}
+}
+function remember(){
+ history.push(JSON.stringify({sheets,activeSheet}));
+ if(history.length>50)history.shift();
+ redoHistory=[];
+}
+function undo(){
+ if(!history.length){alert("Nothing to undo");return;}
+ redoHistory.push(JSON.stringify({sheets,activeSheet}));
+ const previous=JSON.parse(history.pop());
+ sheets=previous.sheets;
+ activeSheet=Math.min(previous.activeSheet||0,sheets.length-1);
+ selectedCell={r:0,c:0};
+ renderAll();selectCell(0,0);save();
+}
+function redo(){
+ if(!redoHistory.length){alert("Nothing to redo");return;}
+ history.push(JSON.stringify({sheets,activeSheet}));
+ const next=JSON.parse(redoHistory.pop());
+ sheets=next.sheets;
+ activeSheet=Math.min(next.activeSheet||0,sheets.length-1);
+ selectedCell={r:0,c:0};
+ renderAll();selectCell(0,0);save();
+}
+function showTab(tab,btn){
+ document.querySelectorAll(".ribbon-tabs button").forEach(b=>b.classList.remove("active"));
+ btn.classList.add("active");
+ ["home","insert","data","view"].forEach(x=>{
+  document.getElementById(x+"Tools").hidden=x!==tab;
+ });
+}
+function selectCell(r,c){
+ selectedCell={r,c};
+ document.getElementById("cellName").value=colName(c)+(r+1);
+ document.getElementById("formulaInput").value=sheet().data[key(r,c)]||"";
+}
+// Formula evaluator with range support and circular-reference protection.
+function calculate(formula, stack){
+ const s=sheet();
+ stack=stack||new Set();
+ const m=String(formula||"").trim().match(/^=(SUM|AVERAGE|MIN|MAX|COUNT)\s*\(([\s\S]*)\)$/i);
+ if(!m)return "#ERROR";
+ const fn=m[1].toUpperCase(), body=m[2].trim();
+ if(!body)return 0;
+ const parts=body.split(/[;,]/).map(x=>x.trim()).filter(Boolean), nums=[];
+ const parseRef=ref=>{
+  const q=ref.replace(/\$/g,"").toUpperCase().match(/^([A-Z]+)(\d+)$/);
+  if(!q||Number(q[2])<1)return null;
+  return {r:Number(q[2])-1,c:colNumber(q[1])};
+ };
+ for(const part of parts){
+  const rm=part.match(/^(\$?[A-Z]{1,3}\$?\d+)\s*:\s*(\$?[A-Z]{1,3}\$?\d+)$/i);
+  const sm=part.match(/^(\$?[A-Z]{1,3}\$?\d+)$/i);
+  if(!rm&&!sm)return "#ERROR";
+  const p1=parseRef(rm?rm[1]:sm[1]),p2=parseRef(rm?rm[2]:sm[1]);
+  if(!p1||!p2)return "#ERROR";
+  for(let r=Math.min(p1.r,p2.r);r<=Math.max(p1.r,p2.r);r++){
+   for(let c=Math.min(p1.c,p2.c);c<=Math.max(p1.c,p2.c);c++){
+    const v=evaluateCell(r,c,stack);
+    if(typeof v==="string"&&v.startsWith("#"))return v;
+    if(v!==""&&v!==null&&v!==undefined&&Number.isFinite(Number(v)))nums.push(Number(v));
+   }
+  }
+ }
+ if(fn==="COUNT")return nums.length;
+ if(fn==="SUM")return nums.reduce((a,b)=>a+b,0);
+ if(!nums.length)return 0;
+ if(fn==="AVERAGE")return nums.reduce((a,b)=>a+b,0)/nums.length;
+ if(fn==="MIN")return Math.min(...nums);
+ if(fn==="MAX")return Math.max(...nums);
+ return "#ERROR";
+}
+function evaluateCell(r,c,stack){
+ const id=key(r,c), raw=sheet().data[id];
+ if(raw===undefined||raw===null||raw==="")return "";
+ if(typeof raw==="string"&&raw.trim().startsWith("=")){
+  if(stack.has(id))return "#CIRCULAR";
+  const next=new Set(stack);next.add(id);
+  return calculate(raw,next);
+ }
+ return raw;
+}
+function valueAt(r,c){return evaluateCell(r,c,new Set());}
+
+function renderAll(){
+ renderTable();renderTabs();
+ document.getElementById("sheetTitle").textContent=sheet().name;
+ drawChart();
+}
+function renderTable(){
+ let s=sheet(),html="<thead><tr><th>#</th>";
+ for(let c=0;c<s.cols;c++){
+  html+='<th style="width:'+(s.widths[c]||120)+'px">'+colName(c)+
+   '<span class="resize-handle" data-col="'+c+'"></span></th>';
+ }
+ html+="</tr></thead><tbody>";
+ for(let r=0;r<s.rows;r++){
+  html+='<tr style="height:'+(s.heights[r]||36)+'px"><td>'+
+   (r+1)+'<span class="row-handle" data-row="'+r+'"></span></td>';
+  for(let c=0;c<s.cols;c++){
+   html+='<td contenteditable="true" data-r="'+r+'" data-c="'+c+'">'+
+    escapeHTML(valueAt(r,c))+'</td>';
+  }
+  html+="</tr>";
+ }
+ html+="</tbody>";
+ document.getElementById("sheetGrid").innerHTML=html;
+
+ document.querySelectorAll("#sheetGrid td[contenteditable]").forEach(td=>{
+  td.addEventListener("focus",()=>{selectCell(+td.dataset.r,+td.dataset.c);remember();});
+  td.addEventListener("click",()=>selectCell(+td.dataset.r,+td.dataset.c));
+  td.addEventListener("input",()=>{
+   sheet().data[key(+td.dataset.r,+td.dataset.c)]=td.innerText;
+   document.getElementById("saveStatus").textContent="● Saving…";
+   save();drawChart();
+  });
+  td.addEventListener("keydown",e=>{
+   if(e.key==="Enter"){
+    e.preventDefault();
+    const r=+td.dataset.r,c=+td.dataset.c;
+    const nextR=Math.min(r+1,sheet().rows-1);
+    renderAll();
+    selectCell(nextR,c);
+    const next=document.querySelector('#sheetGrid td[data-r="'+nextR+'"][data-c="'+c+'"]');
+    if(next)next.focus();
+    save();
+   }
+  });
+ });
+ addResizeEvents();
+}
+function addResizeEvents(){
+ const grid=document.getElementById("sheetGrid");
+ if(!grid)return;
+ function attach(handle,axis){
+  handle.addEventListener("pointerdown",function(e){
+   if(e.pointerType==="mouse" && e.button!==0)return;
+   e.preventDefault();e.stopPropagation();
+   const index=Number(axis==="x"?handle.dataset.col:handle.dataset.row);
+   const cell=axis==="x"?handle.parentElement:handle.parentElement.parentElement;
+   if(!cell)return;
+   const start=axis==="x"?e.clientX:e.clientY;
+   const initial=axis==="x"?cell.getBoundingClientRect().width:cell.getBoundingClientRect().height;
+   let finished=false;
+   function move(ev){
+    if(finished)return;
+    const delta=(axis==="x"?ev.clientX:ev.clientY)-start;
+    const size=axis==="x"?Math.max(60,Math.min(500,initial+delta)):Math.max(28,Math.min(180,initial+delta));
+    if(axis==="x"){
+     sheet().widths[index]=Math.round(size);
+     cell.style.width=size+"px";cell.style.minWidth=size+"px";cell.style.maxWidth=size+"px";
+     grid.querySelectorAll("tbody tr").forEach(row=>{
+      const target=row.children[index+1];
+      if(target){target.style.width=size+"px";target.style.minWidth=size+"px";target.style.maxWidth=size+"px";}
+     });
+    }else{
+     sheet().heights[index]=Math.round(size);
+     const row=cell.parentElement;
+     if(row){row.style.height=size+"px";Array.from(row.children).forEach(td=>td.style.height=size+"px");}
+    }
+   }
+   function finish(){
+    if(finished)return;finished=true;
+    document.removeEventListener("pointermove",move);
+    document.removeEventListener("pointerup",finish);
+    document.removeEventListener("pointercancel",finish);
+    save();renderTable();
+   }
+   document.addEventListener("pointermove",move,{passive:false});
+   document.addEventListener("pointerup",finish,{once:true});
+   document.addEventListener("pointercancel",finish,{once:true});
+  },{passive:false});
+ }
+ grid.querySelectorAll(".resize-handle").forEach(h=>attach(h,"x"));
+ grid.querySelectorAll(".row-handle").forEach(h=>attach(h,"y"));
+}
+function renderTabs(){
+ let box=document.getElementById("sheetTabs");
+ box.innerHTML="";
+ sheets.forEach((s,i)=>{
+  let b=document.createElement("button");
+  b.className="sheet-tab"+(i===activeSheet?" selected":"");
+  b.textContent=s.name;
+  b.onclick=()=>{activeSheet=i;renderAll();save();};
+  box.appendChild(b);
+ });
+}
+// One-tap formulas: use the contiguous filled cells immediately above the selected cell.
+function quickFunction(fn){
+ const s=sheet(),r=selectedCell.r,c=selectedCell.c;
+ let end=r-1;
+ while(end>=0){
+  const v=s.data[key(end,c)];
+  if(v===undefined||String(v).trim()==="")break;
+  end--;
+ }
+ let start=end+1;
+ if(start>r-1){
+  const range=prompt("Kis range par "+fn+" lagana hai? Example: A1:A3",colName(c)+"1:"+colName(c)+Math.max(1,r));
+  if(!range)return;
+  const cleaned=range.trim().replace(/\s/g,"").toUpperCase();
+  if(!/^\$?[A-Z]{1,3}\$?\d+:\$?[A-Z]{1,3}\$?\d+$/.test(cleaned)){
+   alert("Range aise likhein: A1:A3");return;
+  }
+  document.getElementById("formulaInput").value="="+fn+"("+cleaned+")";
+ }else{
+  document.getElementById("formulaInput").value="="+fn+"("+colName(c)+(start+1)+":"+colName(c)+r+")";
+ }
+ applyFormula();
+}
+function applyFormula(){
+ let v=document.getElementById("formulaInput").value;
+ remember();sheet().data[key(selectedCell.r,selectedCell.c)]=v;
+ renderAll();selectCell(selectedCell.r,selectedCell.c);save();
+}
+function addRow(){remember();sheet().rows++;renderAll();save();}
+function addColumn(){remember();sheet().cols++;renderAll();save();}
+function deleteRow(){
+ let s=sheet(),r=selectedCell.r;if(s.rows<=1)return;
+ remember();let d={};
+ Object.keys(s.data).forEach(k=>{
+  let [a,b]=k.split("_").map(Number);
+  if(a<r)d[k]=s.data[k];else if(a>r)d[key(a-1,b)]=s.data[k];
+ });
+ s.data=d;s.rows--;selectedCell.r=Math.max(0,r-1);
+ renderAll();selectCell(selectedCell.r,selectedCell.c);save();
+}
+function deleteColumn(){
+ let s=sheet(),c=selectedCell.c;if(s.cols<=1)return;
+ remember();let d={};
+ Object.keys(s.data).forEach(k=>{
+  let [a,b]=k.split("_").map(Number);
+  if(b<c)d[k]=s.data[k];else if(b>c)d[key(a,b-1)]=s.data[k];
+ });
+ s.data=d;s.cols--;selectedCell.c=Math.max(0,c-1);
+ renderAll();selectCell(selectedCell.r,selectedCell.c);save();
+}
+function addSheet(){
+ remember();sheets.push(makeSheet("Sheet "+(sheets.length+1)));
+ activeSheet=sheets.length-1;renderAll();save();
+}
+function renameSheet(){
+ let n=prompt("Enter sheet name:",sheet().name);
+ if(n&&n.trim()&&n.trim()!==sheet().name){remember();sheet().name=n.trim();renderAll();save();}
+}
+function formatBold(){
+ let td=document.querySelector('[data-r="'+selectedCell.r+'"][data-c="'+selectedCell.c+'"]');
+ if(td){td.style.fontWeight=td.style.fontWeight==="bold"?"normal":"bold";}
+}
+function clearCell(){
+ remember();delete sheet().data[key(selectedCell.r,selectedCell.c)];
+ renderAll();selectCell(selectedCell.r,selectedCell.c);save();
+}
+function downloadCSV(){
+ let s=sheet(),lines=[];
+ for(let r=0;r<s.rows;r++){
+  let row=[];
+  for(let c=0;c<s.cols;c++){
+   row.push('"'+String(s.data[key(r,c)]||"").replace(/"/g,'""')+'"');
+  }
+  lines.push(row.join(","));
+ }
+ let blob=new Blob([lines.join("\n")],{type:"text/csv"});
+ let a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);a.download=s.name+".csv";a.click();
+ setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function sortData(){
+ let s=sheet(),c=selectedCell.c;remember();
+ let vals=[];
+ for(let r=0;r<s.rows;r++)vals.push(s.data[key(r,c)]||"");
+ vals.sort((a,b)=>String(a).localeCompare(String(b)));
+ vals.forEach((v,r)=>s.data[key(r,c)]=v);
+ renderAll();save();
+}
+</script>
+
+<script>
+function createChart(type){
+ chartType=type;
+ drawChart();
+}
+function clearChart(){
+ let canvas=document.getElementById("chart");
+ canvas.getContext("2d").clearRect(0,0,canvas.width,canvas.height);
+}
+function drawChart(){
+ let canvas=document.getElementById("chart");
+ if(!canvas)return;
+ let w=canvas.clientWidth||600,h=220;
+ canvas.width=w*2;canvas.height=h*2;
+ let ctx=canvas.getContext("2d");
+ ctx.scale(2,2);
+ ctx.clearRect(0,0,w,h);
+
+ let labels=[],values=[],s=sheet();
+ for(let r=0;r<s.rows;r++){
+  let label=s.data[key(r,0)],v=s.data[key(r,1)];
+  if(label!==undefined&&label!==""&&v!==undefined&&v!==""&&Number.isFinite(Number(v))){
+   labels.push(String(label));values.push(Number(v));
+  }
+ }
+ if(!values.length){
+  ctx.fillStyle="#91a4b1";ctx.font="13px Arial";
+  ctx.fillText("Add labels in column A and numbers in column B",12,30);
+  return;
+ }
+ let colors=["#42d58a","#438de5","#f4b942","#b07bea","#ed7777","#4fc5c5"];
+ if(chartType==="pie"){
+  let total=values.reduce((a,b)=>a+Math.max(0,b),0);
+  if(total<=0)return;
+  let start=-Math.PI/2;
+  values.forEach((v,i)=>{
+   let angle=Math.max(0,v)/total*Math.PI*2;
+   ctx.beginPath();ctx.moveTo(w/2,h/2);
+   ctx.arc(w/2,h/2,Math.min(w,h)*.34,start,start+angle);
+   ctx.closePath();ctx.fillStyle=colors[i%colors.length];ctx.fill();
+   start+=angle;
+  });
+  return;
+ }
+ let max=Math.max(1,...values),min=Math.min(0,...values);
+ let pad=35,base=h-35,available=h-65;
+ let slot=(w-pad*2)/values.length;
+ function point(i){
+  return {x:pad+i*slot+slot/2,
+   y:base-(values[i]-min)/(max-min||1)*available};
+ }
+ if(chartType==="area"){
+  ctx.beginPath();
+  values.forEach((v,i)=>{
+   let p=point(i);
+   if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);
+  });
+  ctx.lineTo(point(values.length-1).x,base);
+  ctx.lineTo(point(0).x,base);
+  ctx.closePath();ctx.fillStyle="rgba(66,213,138,.2)";ctx.fill();
+ }
+ if(chartType==="line"||chartType==="area"){
+  ctx.beginPath();
+  values.forEach((v,i)=>{
+   let p=point(i);
+   if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);
+  });
+  ctx.strokeStyle="#42d58a";ctx.lineWidth=3;ctx.stroke();
+ }
+ values.forEach((v,i)=>{
+  let p=point(i);
+  if(chartType==="bar"){
+   let barH=(v-min)/(max-min||1)*available;
+   ctx.fillStyle="#42d58a";
+   ctx.fillRect(p.x-slot*.28,base-barH,slot*.56,barH);
+  }else{
+   ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);
+   ctx.fillStyle="#42d58a";ctx.fill();
+  }
+  ctx.fillStyle="#aabac5";ctx.font="10px Arial";ctx.textAlign="center";
+  ctx.fillText(labels[i].slice(0,10),p.x,h-12);
+ });
+}
+load();
+renderAll();
+selectCell(0,0);
+window.addEventListener("resize",drawChart);
+</script>
+
+<script>
+// SheetPrime feature extension. Original data model and sheetlite_complete_v2 key retained.
+(function(){
+ const K=(r,c)=>key(r,c), S=()=>sheet();
+ const styles=()=>S().styles||(S().styles={});
+ const oldRender=renderTable;
+ window.renderTable=function(){oldRender();document.querySelectorAll('#sheetGrid td[data-r][data-c]').forEach(td=>{const st=(S().styles||{})[K(+td.dataset.r,+td.dataset.c)]||{};td.style.fontWeight=st.bold?'bold':'';td.style.fontStyle=st.italic?'italic':'';td.style.textDecoration=st.underline?'underline':'';td.style.color=st.color||'';td.style.backgroundColor=st.background||'';td.style.textAlign=st.align||'';td.style.border=st.border?'1px solid #8094a3':'';});};
+ window.formatBold=function(){spFormat('bold');};
+ window.spFormat=function(prop,val){const r=selectedCell.r,c=selectedCell.c,k=K(r,c);remember();const st=styles()[k]||(styles()[k]={});if(prop==='bold'||prop==='italic'||prop==='underline'||prop==='border')st[prop]=!st[prop];else st[prop]=val;renderAll();selectCell(r,c);save();};
+ function col(c){return colName(c);}
+ function formulaValue(raw, id, stack){
+  let f=String(raw??'').trim();if(!f.startsWith('=')){const m=f.match(/^(SUM|AVERAGE|MIN|MAX|COUNT)\s+([A-Z]+\d+:[A-Z]+\d+)$/i);if(m)f='='+m[1]+'('+m[2]+')';else return raw;}
+  const expr=f.slice(1);let tokens=[],i=0;while(i<expr.length){let rest=expr.slice(i),m;if(/\s/.test(expr[i])){i++;continue;}if((m=rest.match(/^(\d+(?:\.\d*)?|\.\d+)/))){tokens.push({n:+m[0]});i+=m[0].length;continue;}if((m=rest.match(/^([A-Za-z]+\d+)/))){tokens.push({id:m[1].toUpperCase()});i+=m[0].length;continue;}if((m=rest.match(/^(SUM|AVERAGE|MIN|MAX|COUNT|ABS|ROUND|SQRT)/i))){tokens.push({fn:m[0].toUpperCase()});i+=m[0].length;continue;}if('+-*/^(),:'.includes(expr[i])){tokens.push(expr[i++]);continue;}return '#ERROR';}
+  let p=0;const peek=()=>tokens[p],take=()=>tokens[p++];
+  function cell(ref){let m=ref.match(/^([A-Z]+)(\d+)$/);if(!m)return '#REF!';let r=+m[2]-1,c=colNumber(m[1]),k=K(r,c);if(k===id||stack.includes(k))return '#CIRCULAR';let v=S().data[k];if(v===undefined||v==='')return 0;if(typeof v==='string'&&(v.trim().startsWith('=')||/^(SUM|AVERAGE|MIN|MAX|COUNT)\s+/i.test(v.trim())))return formulaValue(v,k,[...stack,k]);let n=Number(v);return Number.isFinite(n)?n:v;}
+  function primary(){let t=take();if(!t)return '#ERROR';if(typeof t==='object'&&'n'in t)return t.n;if(t==='('){let v=add();if(take()!==')')throw Error('#ERROR');return v;}if(t&&t.id){if(peek()===':'){take();let e=take();if(!e?.id)throw Error('#REF!');let a=t.id.match(/^([A-Z]+)(\d+)$/),b=e.id.match(/^([A-Z]+)(\d+)$/);if(!a||!b)throw Error('#REF!');let vals=[];for(let r=Math.min(+a[2],+b[2])-1;r<=Math.max(+a[2],+b[2])-1;r++)for(let c=Math.min(colNumber(a[1]),colNumber(b[1]));c<=Math.max(colNumber(a[1]),colNumber(b[1]));c++){let v=cell(col(c)+(r+1));if(typeof v==='string'&&v.startsWith('#'))throw Error(v);if(typeof v==='number')vals.push(v);}return {range:vals};}return cell(t.id);}if(t?.fn){if(take()!=='(')throw Error('#ERROR');let args=[];if(peek()!==')'){while(true){args.push(add());if(peek()===','){take();continue;}break;}}if(take()!==')')throw Error('#ERROR');let vals=args.flatMap(x=>x?.range||[x]).filter(x=>typeof x==='number'&&Number.isFinite(x));switch(t.fn){case'SUM':return vals.reduce((a,b)=>a+b,0);case'COUNT':return vals.length;case'AVERAGE':return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;case'MIN':return vals.length?Math.min(...vals):0;case'MAX':return vals.length?Math.max(...vals):0;case'ABS':return Math.abs(Number(args[0]));case'ROUND':return Number(Number(args[0]).toFixed(Number(args[1]||0)));case'SQRT':return Math.sqrt(Number(args[0]));}}throw Error('#ERROR');}
+  function unary(){if(peek()==='-'){take();return -unary();}if(peek()==='+'){take();return +unary();}return primary();}function power(){let a=unary();while(peek()==='^'){take();a=Math.pow(a,unary());}return a;}function mul(){let a=power();while(peek()==='*'||peek()==='/'){let op=take(),b=power();if(op==='/'&&Number(b)===0)throw Error('#DIV/0!');a=op==='*'?Number(a)*Number(b):Number(a)/Number(b);}return a;}function add(){let a=mul();while(peek()==='+'||peek()==='-'){let op=take(),b=mul();a=op==='+'?Number(a)+Number(b):Number(a)-Number(b);}return a;}
+  try{let v=add();if(p!==tokens.length||v?.range)throw Error('#VALUE!');return Number.isFinite(v)?v:v;}catch(e){return e.message?.startsWith('#')?e.message:'#ERROR';}
+ }
+ window.calculate=function(f,stack){return formulaValue(f,'__preview__',stack?[...stack]:[]);};
+ window.evaluateCell=function(r,c,stack){let k=K(r,c),v=S().data[k];if(v===undefined||v===null||v==='')return '';if(typeof v==='string'&&(v.trim().startsWith('=')||/^(SUM|AVERAGE|MIN|MAX|COUNT)\s+/i.test(v.trim())))return formulaValue(v,k,stack?[...stack,k]:[k]);return v;};
+ window.valueAt=function(r,c){return evaluateCell(r,c,new Set());};
+ window.quickFunction=function(fn){const r=selectedCell.r,c=selectedCell.c;let end=r-1;while(end>=0&&S().data[K(end,c)]!==undefined&&String(S().data[K(end,c)]).trim()!=='')end--;let start=end+1;if(start>=r){let rg=prompt('Range, e.g. A1:A3',col(c)+'1:'+col(c)+Math.max(1,r));if(!rg)return;rg=rg.replace(/\s/g,'').toUpperCase();if(!/^[A-Z]+\d+:[A-Z]+\d+$/.test(rg))return alert('Enter a range like A1:A3');document.getElementById('formulaInput').value='='+fn+'('+rg+')';}else document.getElementById('formulaInput').value='='+fn+'('+col(c)+(start+1)+':'+col(c)+r+')';applyFormula();};
+ // Native clipboard fallback: app-internal copy/cut/paste always works.
+ let clip=null;window.copyCell=function(){let k=K(selectedCell.r,selectedCell.c);clip={v:S().data[k]??'',s:JSON.parse(JSON.stringify((S().styles||{})[k]||{}))};try{navigator.clipboard?.writeText(String(clip.v));}catch(e){};};window.cutCell=function(){copyCell();remember();delete S().data[K(selectedCell.r,selectedCell.c)];delete styles()[K(selectedCell.r,selectedCell.c)];renderAll();};window.pasteCell=function(){if(!clip)return alert('Copy a cell first.');remember();let k=K(selectedCell.r,selectedCell.c);S().data[k]=clip.v;styles()[k]=clip.s;renderAll();selectCell(selectedCell.r,selectedCell.c);save();};
+ // Find and result navigation.
+ let matches=[],mi=0;window.spSearch=function(){let q=prompt('Find:', '');if(!q)return;matches=[];let s=S();for(let r=0;r<s.rows;r++)for(let c=0;c<s.cols;c++)if(String(s.data[K(r,c)]??'').toLowerCase().includes(q.toLowerCase()))matches.push([r,c]);mi=0;if(!matches.length)return alert('No matches found');spFind(0);};window.spFind=function(d){if(!matches.length)return;mi=(mi+d+matches.length)%matches.length;let [r,c]=matches[mi];selectCell(r,c);let td=document.querySelector('#sheetGrid td[data-r="'+r+'"][data-c="'+c+'"]');if(td){td.focus();td.scrollIntoView({block:'center',inline:'center'});td.style.outline='3px solid #e6a23c';}};
+ // CSV import with quoted field support.
+ function parseCSV(t){let rows=[],row=[],v='',q=false;for(let i=0;i<t.length;i++){let ch=t[i];if(q){if(ch==='"'&&t[i+1]==='"'){v+='"';i++;}else if(ch==='"')q=false;else v+=ch;}else if(ch==='"')q=true;else if(ch===','){row.push(v);v='';}else if(ch==='\n'){row.push(v.replace(/\r$/,''));rows.push(row);row=[];v='';}else v+=ch;}row.push(v.replace(/\r$/,''));if(row.some(x=>x!==''))rows.push(row);return rows;}
+ window.spImportCSV=function(e){let f=e.target.files?.[0];if(!f)return;let rd=new FileReader();rd.onload=()=>{let rows=parseCSV(String(rd.result));remember();let s=S();s.rows=Math.max(1,rows.length);s.cols=Math.max(1,...rows.map(x=>x.length));s.data={};rows.forEach((row,r)=>row.forEach((v,c)=>{if(v!=='')s.data[K(r,c)]=v;}));renderAll();save();e.target.value='';};rd.readAsText(f);};
+ function loadLib(url){return new Promise((ok,no)=>{let x=document.createElement('script');x.src=url;x.onload=ok;x.onerror=()=>no(Error('Could not load library. Internet is required.'));document.head.appendChild(x);});}
+ async function xlsx(){if(!window.XLSX)await loadLib('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');return XLSX;}
+ window.spXlsxExport=async function(){try{let X=await xlsx(),wb=X.utils.book_new();sheets.forEach(sh=>{let aoa=[];for(let r=0;r<sh.rows;r++){let row=[];for(let c=0;c<sh.cols;c++)row.push(sh.data[K(r,c)]??'');aoa.push(row);}let ws=X.utils.aoa_to_sheet(aoa);for(let r=0;r<sh.rows;r++)for(let c=0;c<sh.cols;c++){let v=sh.data[K(r,c)],a=X.utils.encode_cell({r,c});if(typeof v==='string'&&v.startsWith('=')){ws[a]=ws[a]||{t:'n'};ws[a].f=v.slice(1);delete ws[a].v;}}X.utils.book_append_sheet(wb,ws,(sh.name||'Sheet').slice(0,31));});X.writeFile(wb,'SheetPrime_Workbook.xlsx');}catch(e){alert('XLSX export failed: '+e.message);}};
+ window.spImportXlsx=async function(e){let f=e.target.files?.[0];if(!f)return;try{let X=await xlsx(),wb=X.read(await f.arrayBuffer(),{type:'array'}),next=[];wb.SheetNames.forEach(n=>{let ws=wb.Sheets[n],a=X.utils.sheet_to_json(ws,{header:1,defval:''}),sh={name:n,rows:Math.max(1,a.length),cols:Math.max(1,...a.map(x=>x.length)),data:{},styles:{},widths:{},heights:{}};a.forEach((row,r)=>row.forEach((v,c)=>{let cell=ws[X.utils.encode_cell({r,c})];if(cell?.f)sh.data[K(r,c)]='='+cell.f;else if(v!=='')sh.data[K(r,c)]=v;}));next.push(sh);});if(next.length){remember();sheets=next;activeSheet=0;renderAll();save();}}catch(err){alert('XLSX import failed: '+err.message);}e.target.value='';};
+ window.spPdfExport=function(){let w=window.open('','_blank');if(!w)return alert('Allow pop-ups for PDF export.');let s=S(),h='<html><head><title>SheetPrime PDF</title><style>table{border-collapse:collapse}td{border:1px solid #777;padding:5px}</style></head><body><table>';for(let r=0;r<s.rows;r++){h+='<tr>';for(let c=0;c<s.cols;c++)h+='<td>'+String(valueAt(r,c)??'')+'</td>';h+='</tr>';}w.document.write(h+'</table></body></html>');w.document.close();w.print();};
+ window.spImportPdf=async function(e){let f=e.target.files?.[0];if(!f)return;try{if(!window.pdfjsLib)await loadLib('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';let pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise,rows=[];for(let n=1;n<=pdf.numPages;n++){let page=await pdf.getPage(n),tc=await page.getTextContent(),items=tc.items.filter(x=>x.str.trim()).sort((a,b)=>Math.abs(b.transform[5]-a.transform[5])>3?b.transform[5]-a.transform[5]:a.transform[4]-b.transform[4]);let lines=[];items.forEach(it=>{let l=lines.find(x=>Math.abs(x.y-it.transform[5])<3);if(!l){l={y:it.transform[5],a:[]};lines.push(l);}l.a.push(it);});lines.sort((a,b)=>b.y-a.y).forEach(l=>{l.a.sort((a,b)=>a.transform[4]-b.transform[4]);rows.push(l.a.map(x=>x.str.trim()));});}let s=S();remember();s.rows=Math.max(1,rows.length);s.cols=Math.max(1,...rows.map(x=>x.length));s.data={};rows.forEach((row,r)=>row.forEach((v,c)=>{if(v)s.data[K(r,c)]=v;}));renderAll();save();alert('PDF text extraction complete. Scanned PDFs and complex layouts may require OCR/manual cleanup.');}catch(err){alert('PDF import failed: '+err.message);}e.target.value='';};
+ // Formula changes propagate on next render; persist schema extension without changing legacy key.
+ renderAll();
+})();
+</script>
+
+
+<script>
+// SheetPrime Premium PWA layer. Does not change the legacy spreadsheet storage key/schema.
+(function(){
+  const status=document.getElementById('offlineStatus');
+  const installBtn=document.getElementById('installAppBtn');
+  let installPrompt=null;
+  function updateNetwork(){
+    if(status) status.textContent=navigator.onLine?'· Online / offline-ready after assets are cached':'· Offline mode';
+  }
+  window.addEventListener('online',updateNetwork);
+  window.addEventListener('offline',updateNetwork);
+  updateNetwork();
+
+  window.addEventListener('beforeinstallprompt',function(e){
+    e.preventDefault(); installPrompt=e;
+    if(installBtn){installBtn.hidden=false;installBtn.textContent='Install App';}
+  });
+  if(installBtn){
+    installBtn.addEventListener('click',async function(){
+      if(!installPrompt){
+        alert('Chrome menu (⋮) खोलें और “Install app” या “Add to Home screen” चुनें।');
+        return;
+      }
+      installPrompt.prompt();
+      try{await installPrompt.userChoice;}catch(e){}
+      installPrompt=null; installBtn.hidden=true;
+    });
+  }
+  window.addEventListener('appinstalled',function(){
+    if(installBtn)installBtn.hidden=true;
+    if(status)status.textContent='· Installed';
+  });
+
+  // Explicit JSON transfer keeps the original localStorage schema intact when
+  // moving from Acode/file preview to the HTTPS PWA origin.
+  window.spExportDataBackup=function(){
+    try{
+      const raw=localStorage.getItem('sheetlite_complete_v2');
+      if(!raw){alert('Is browser origin mein spreadsheet data nahi mila.');return;}
+      const parsed=JSON.parse(raw);
+      if(!parsed || !Array.isArray(parsed.sheets)){alert('Backup data format valid nahi hai.');return;}
+      const blob=new Blob([raw],{type:'application/json'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='SheetPrime_Data_Backup.json';a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+    }catch(e){alert('Backup export failed: '+e.message);}
+  };
+  window.spRestoreDataBackup=function(event){
+    const file=event.target.files && event.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=function(){
+      try{
+        const incoming=JSON.parse(String(reader.result));
+        if(!incoming || !Array.isArray(incoming.sheets) || !incoming.sheets.length ||
+           !incoming.sheets.every(s=>s && typeof s==='object' && Number.isFinite(Number(s.rows)) && Number.isFinite(Number(s.cols)) && s.data && typeof s.data==='object')){
+          throw new Error('Backup format match nahi hua.');
+        }
+        if(!confirm('Current data ka backup banakar imported data restore karein?'))return;
+        const current=localStorage.getItem('sheetlite_complete_v2');
+        if(current){const check=JSON.parse(current);if(check && Array.isArray(check.sheets))localStorage.setItem('sheetlite_complete_v2_backup',current);}
+        localStorage.setItem('sheetlite_complete_v2',JSON.stringify(incoming));
+        alert('Backup restore ho gaya. SheetPrime reload hoga.');location.reload();
+      }catch(err){alert('Restore nahi hua: '+err.message);}
+      finally{event.target.value='';}
+    };
+    reader.readAsText(file);
+  };
+
+  if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')){
+    window.addEventListener('load',async function(){
+      try{
+        const reg=await navigator.serviceWorker.register('./service-worker.js',{scope:'./'});
+        // Warm the original CDN-hosted spreadsheet/PDF libraries while online so the
+        // service worker can keep them for later offline use. This is non-blocking.
+        if(navigator.onLine){
+          navigator.serviceWorker.ready.then(async()=>{
+            const libs=[
+              'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',
+              'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+              'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+            ];
+            await Promise.allSettled(libs.map(url=>fetch(url,{mode:'cors'})));
+            if(status && navigator.onLine)status.textContent='· Offline spreadsheet tools cached (if CDN access succeeded)';
+          });
+        }
+        if(reg.waiting){showUpdate(reg.waiting);}
+        reg.addEventListener('updatefound',function(){
+          const worker=reg.installing;
+          if(worker)worker.addEventListener('statechange',function(){
+            if(worker.state==='installed' && navigator.serviceWorker.controller)showUpdate(worker);
+          });
+        });
+        navigator.serviceWorker.addEventListener('controllerchange',function(){
+          if(!window.__spReloaded){window.__spReloaded=true;location.reload();}
+        });
+      }catch(err){console.warn('PWA service worker registration failed:',err);if(status)status.textContent='· Offline setup unavailable';}
+    });
+  } else if(status && location.protocol!=='https:' && location.hostname!=='localhost'){
+    status.textContent='· HTTPS required for offline install';
+  }
+  function showUpdate(worker){
+    if(document.getElementById('spUpdateNotice'))return;
+    const b=document.createElement('button');b.id='spUpdateNotice';b.textContent='Update available · Reload';
+    b.style.cssText='position:fixed;z-index:9999;bottom:16px;left:50%;transform:translateX(-50%);background:#42d58a;color:#07170f;border:0;padding:12px 16px;border-radius:12px;font-weight:700;box-shadow:0 4px 24px #0008';
+    b.addEventListener('click',function(){worker.postMessage({type:'SKIP_WAITING'});});
+    document.body.appendChild(b);
+  }
+})();
+</script>
+
+</body>
+</html>
+
